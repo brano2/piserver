@@ -1,0 +1,6 @@
+# Python junk
+__pycache__/
+
+# IDE stuff
+.idea/
+
