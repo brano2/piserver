@@ -1,6 +1,7 @@
 # Python junk
 __pycache__/
+*.egg-info
 
 # IDE stuff
 .idea/
-
+.vscode/
