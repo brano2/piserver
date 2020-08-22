@@ -9,7 +9,7 @@ class Camera:
     _stream: VideoStream
 
     def __init__(self):
-        self._stream = VideoStream(usePiCamera=True, resolution=(820, 616))
+        self._stream = VideoStream(usePiCamera=True, resolution=(640, 480))
         self._stream.start()
 
     def get_latest_frame(self):
