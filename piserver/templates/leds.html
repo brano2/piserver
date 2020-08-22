@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>LED Control Panel</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+
+    <div class="container p-3 my-3 border">
+        <h1>LED Control Panel</h1>
+        <button type="button" class="btn" id="btnR">Red</button>
+        <button type="button" class="btn" id="btnG">Green</button>
+        <button type="button" class="btn" id="btnB">Blue</button>
+        <button type="button" class="btn" id="btnW">White</button>
+        <button type="button" class="btn" id="btnIR">Infrared</button>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+    <script src="{{ url_for('static', filename='buttons.js') }}"></script>
+</body>
+
+</html>
