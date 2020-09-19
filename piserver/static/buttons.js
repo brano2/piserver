@@ -2,8 +2,7 @@ var ledBtnColours = {
     btnR:"btn-danger",
     btnG:"btn-success",
     btnB:"btn-primary",
-    btnW:"btn-light",
-    btnIR:"btn-secondary"
+    btnW:"btn-light"
 };
 
 function updateLedStatus(ledBtn, isOn) {
