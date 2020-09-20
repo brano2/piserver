@@ -6,7 +6,10 @@ from flask import jsonify, render_template, request, Response
 from piserver import app, cam
 from my_hw.camera import capture
 from my_hw.leds import ALL_LEDS
-from my_hw.thermometer import get_temperature
+from my_hw.thermometer import Ds18b20
+
+
+thermometers = Ds18b20.find_all()
 
 
 @app.route('/')
@@ -38,7 +41,12 @@ def leds_set(led_id: str):
 
 @app.route('/temperature')
 def temperature():
-    return '{} °C'.format(get_temperature())
+    return render_template('temperature.html')
+
+@app.route('/temperature/readall')
+def temperature_readall():
+    # TODO: Check the sensors are operational and refresh the list if needed
+    return jsonify({t.id.hex(): t.get_temperature() for t in thermometers})
 
 def generate():
     while True:
