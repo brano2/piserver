@@ -9,9 +9,6 @@ from my_hw.leds import ALL_LEDS
 from my_hw.thermometer import Ds18b20
 
 
-thermometers = Ds18b20.find_all()
-
-
 @app.route('/')
 @app.route('/index')
 def index():
@@ -45,8 +42,7 @@ def temperature():
 
 @app.route('/temperature/readall')
 def temperature_readall():
-    # TODO: Check the sensors are operational and refresh the list if needed
-    return jsonify({t.id.hex(): t.get_temperature() for t in thermometers})
+    return jsonify({t.id.hex(): t.get_temperature() for t in Ds18b20.get_all() if t.operational})
 
 def generate():
     while True:

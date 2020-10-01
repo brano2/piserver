@@ -1,6 +1,6 @@
 from pathlib import Path
 from threading import Event, Thread
-from typing import Callable, List, Optional, Set
+from typing import Callable, ClassVar, Dict, List, Optional, Set
 
 
 def get_temperature() -> float:
@@ -9,10 +9,26 @@ def get_temperature() -> float:
 
 
 class Ds18b20:
+    _instances: ClassVar[Dict[Path, 'Ds18b20']] = {}
 
     @classmethod
-    def find_all(cls) -> List['Ds18b20']:
-        return [cls(path) for path in Path('/sys/bus/w1/devices').glob('28-*') if path.is_dir()]
+    def _find_all(cls):
+        known_sensor_dirs = set(cls._instances.keys())
+        for path in Path('/sys/bus/w1/devices').glob('28-*'):
+            if path.is_dir() and (path/'id').exists() and (path/'temperature').exists():
+                if path in known_sensor_dirs:
+                    known_sensor_dirs.remove(path)
+                else:
+                    cls._instances[path] = cls(path)  # New sensor found
+        # Remove old sensors that are no longer connected
+        for sensor_dir in known_sensor_dirs:
+            cls._instances[sensor_dir].stop()
+            del cls._instances[sensor_dir]
+
+    @classmethod
+    def get_all(cls) -> List['Ds18b20']:
+        cls._find_all()
+        return list(cls._instances.values())
 
     def __init__(self, directory: Path):
         self._id:                bytes                        = (directory/'id').read_bytes()
@@ -22,12 +38,17 @@ class Ds18b20:
         self._updater:           Optional[Thread]             = None
         self._temperature_ready: Event                        = Event()
         self._listeners:         Set[Callable[[float], None]] = set()
+        self._operational:       bool                         = True
 
         self.start()
 
     @property
     def id(self) -> bytes:
         return self._id
+
+    @property
+    def operational(self) -> bool:
+        return self._operational
 
     def get_temperature(self) -> float:
         if not self._auto_updating:
@@ -53,8 +74,16 @@ class Ds18b20:
         self._listeners.remove(listener)
 
     def _update_temperature(self):
-        temp_mC = int(self._temperature_file.read_text())
-        self._temperature = temp_mC/1000.0
+        # Read the temperature safely
+        if self._temperature_file.exists():
+            temp_mC = self._temperature_file.read_text()  # Takes about 800ms usually
+        else:
+            temp_mC = ''  # Empty string is also often read when the sensor is disconnected
+        self._operational = temp_mC != ''
+
+        # Update
+        if self._operational:
+            self._temperature = int(temp_mC)/1000.0
         if not self._temperature_ready.is_set():
             self._temperature_ready.set()
 
